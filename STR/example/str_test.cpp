@@ -31,13 +31,13 @@ int main(){
   std::cout << mystr2.find(mystr4, pos + mystr4.length()) << '\n';
 
   //testing replace
-  mystr2.replace(mystr4, "bitch!");
+  mystr2.replace(mystr4, "nurse!");
   std::cout << mystr2 << '\n';
   mystr2.replace('l', 'L');
   std::cout << mystr2 << '\n';
-  mystr2.replace("bitch!", "bitch nigga!");
+  mystr2.replace("nurse", "bob");
   std::cout << mystr2 << '\n';
-  mystr2.replace("bitch nigga!", mystr4);
+  mystr2.replace("bob!", mystr4);
   mystr2.replace('L', 'l');
   std::cout << mystr2 << '\n';
   std::cout << mystr2.length() << '\n';
