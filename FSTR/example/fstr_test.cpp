@@ -5,7 +5,7 @@ int count;
 
 int main(){
   //testing STR constructor
-  STR mystr2(mystr, 200);
+  STR mystr2(mystr, 1000);
   std::cout << mystr2 << std::endl;
 
   //testing string and char concatenation

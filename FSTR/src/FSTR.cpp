@@ -1,22 +1,15 @@
 #include "FSTR.h"
 //operators
-char& STR::operator[](size_t pos){
+char& STR::operator[](const size_t pos){
   return this->str[pos];
 }
 
-char STR::operator[](size_t pos) const{
-  return this->str[pos];
-}
 /****************************************/
-STR& STR::operator+=(STR const& _b){
+STR& STR::operator+=(const STR& _b){
   return this->concat(_b);
 }
 
-STR& STR::operator+=(char _b){
-  return this->concat(_b);
-}
-
-STR& STR::operator+=(char* _b){
+STR& STR::operator+=(const char _b){
   return this->concat(_b);
 }
 
@@ -24,15 +17,11 @@ STR& STR::operator+=(const char* _b){
   return this->concat(_b);
 }
 /****************************************/
-STR& STR::operator=(STR const& _b){
+STR& STR::operator=(const STR& _b){
   return this->copy(_b);
 }
 
-STR& STR::operator=(char _b){
-  return this->copy(_b);
-}
-
-STR& STR::operator=(char* _b){
+STR& STR::operator=(const char _b){
   return this->copy(_b);
 }
 
@@ -40,7 +29,7 @@ STR& STR::operator=(const char* _b){
   return this->copy(_b);
 }
 /****************************************/
-bool STR::operator==(STR const &_b){
+bool STR::operator==(const STR& _b){
   if(this->len != _b.len){
     return false;
   }
@@ -54,22 +43,13 @@ bool STR::operator==(STR const &_b){
   return true;
 }
 
-bool STR::operator==(char __c){
+bool STR::operator==(const char __c){
   if(this->len != 1 || this->str[0] != __c){
     return false;
   }
   else{
     return true;
   }
-}
-
-bool STR::operator==(char * __st){
-  for(size_t i = 0; i < this->len; i++){
-    if(this->str[i] != __st[i]){
-      return false;
-    }
-  }
-  return true;
 }
 
 bool STR::operator==(const char * __st){
@@ -81,22 +61,15 @@ bool STR::operator==(const char * __st){
   return true;
 }
 /****************************************/
-STR STR::operator + (STR const &_b){
+STR STR::operator + (const STR& _b){
   STR tmp(this->len + _b.len + 1);
   tmp.copy(*this);
   tmp.concat(_b);
   return tmp;
 }
 
-STR STR::operator + (char _b){
+STR STR::operator + (const char _b){
   STR tmp(this->len + 2);
-  tmp.copy(*this);
-  tmp.concat(_b);
-  return tmp;
-}
-
-STR STR::operator + (char *_b){
-  STR tmp(this->len + arlen(_b) + 1);
   tmp.copy(*this);
   tmp.concat(_b);
   return tmp;
@@ -117,13 +90,13 @@ STR::~STR(){
 /*********************************************************/
 //constructors
 /*********************************************************/
-STR::STR(STR const &__st){
+STR::STR(const STR& __st){
   this->cap = __st.len + 1;
   this->str = new char[this->cap];
   this->copy(__st);
 }
 
-STR::STR(STR const &__st, size_t maxlen){
+STR::STR(const STR& __st, const size_t maxlen){
   this->cap = maxlen + 1;
   this->str = new char[this->cap];
   this->copy(__st);
@@ -135,35 +108,23 @@ STR::STR(const char *__st){
   this->copy(__st);
 }
 
-STR::STR(size_t maxlen){
+STR::STR(const char *__st, const size_t maxlen){
+  this->cap = maxlen + 1;
+  this->str = new char[this->cap];
+  this->copy(__st);
+}
+
+STR::STR(const size_t maxlen){
   this->len = 0;
   this->cap = maxlen + 1;
   this->str = new char[this->cap];
   this->str[0] = '\0';
 }
-
-STR::STR(const char *__st, size_t maxlen){
-  this->cap = maxlen + 1;
-  this->str = new char[this->cap];
-  this->copy(__st);
-}
-
-STR::STR(char *__st){
-  this->cap = arlen(__st) + 1;
-  this->str = new char[this->cap];
-  this->copy(__st);
-}
-
-STR::STR(char *__st, size_t maxlen){
-  this->cap = maxlen + 1;
-  this->str = new char[this->cap];
-  this->copy(__st);
-}
 /*********************************************************/
 //helper functions
 /*********************************************************/
 //use these instead of strlen() and strcpy() so we can omit the standard string library
-size_t arlen(const char *__st){
+size_t arlen(const char* __st){
   size_t pos = 0;
   while(__st[pos] != '\0'){
   pos++;
@@ -171,7 +132,7 @@ size_t arlen(const char *__st){
   return pos;
 }
 
-char * arcpy(char *__st1, const char * __st2){
+char* arcpy(char* __st1, const char* __st2){
   size_t pos = 0;
   while(__st2[pos] != '\0'){
     __st1[pos] = __st2[pos];
@@ -181,7 +142,7 @@ char * arcpy(char *__st1, const char * __st2){
   return __st1;
 }
 
-size_t arncpy(char* __st1, const char* __st2, size_t amount){
+size_t arncpy(char* __st1, const char* __st2, const size_t amount){
   size_t pos;
   for(pos = 0; pos < amount; pos++){
     if(__st2[pos] == '\0') break;
@@ -191,9 +152,9 @@ size_t arncpy(char* __st1, const char* __st2, size_t amount){
   return pos;
 }
 /*********************************************************/
-//member functions
+// public member functions
 /*********************************************************/
-const  size_t& STR::length()const{
+const size_t& STR::length()const{
   return this->len;
 }
 
@@ -205,7 +166,261 @@ const char* STR::cstr()const{
   return this->str;
 }
 /****************************************/
-bool STR::alocc(size_t amount){
+//remove() deletes part of string
+STR& STR::remove(const size_t pos, const size_t howmany){
+  if(pos < this->len){
+    if(howmany >= (this->len - pos)){
+      this->str[pos] = '\0';
+      this->len = pos;
+    }
+    else{
+      this->shiftL(pos, howmany);
+    }
+  }
+  return *this;
+}
+/****************************************/
+//substr() returns part of string
+STR STR::substr(const size_t pos, const size_t howmany){
+  STR tmp(howmany + 1);
+  tmp.len = arncpy(tmp.str, this->str+pos, howmany);
+  return tmp;
+}
+/****************************************/
+//pop() removes characters from end of string
+STR& STR::pop(const size_t howmany){
+  if(howmany >= this->len){
+    this->str[0] = '\0';
+    this->len = 0;
+  }
+  else{
+    this->len -= howmany;
+    this->str[this->len] = '\0';
+  }
+  return *this;
+}
+/****************************************/
+//inserts characters into string
+STR& STR::insert(const STR& __st, size_t pos){
+  if(this->shiftR(pos, __st.len)){
+    this->overwrite(__st, pos, __st.len);
+  }//end if
+  return *this;
+}
+
+STR& STR::insert(const char* __st, size_t pos){
+  size_t stlen = arlen(__st);
+  if(this->shiftR(pos, stlen)){
+    this->overwrite(__st, pos, stlen);
+  }//end if
+  return *this;
+}
+
+STR& STR::insert(const char __c, size_t pos, const uint8_t howmany){
+  if(this->shiftR(pos, howmany)){
+    this->overwrite(__c, pos, howmany);
+  }//end if
+  return *this;
+}
+/****************************************/
+//overwrite() writes string or chars over prev string staring at pos
+//does not affect length unless the replavement string is larger than
+//the remaining string.
+STR& STR::overwrite(const STR& __st, size_t& pos, const size_t len){
+  for(size_t _pos = 0; _pos < len; _pos++){
+    this->str[pos] = __st.str[_pos];
+    pos++;
+  }
+  return *this;
+}
+
+STR& STR::overwrite(const char* __st, size_t& pos,const size_t len){
+  for(size_t _pos = 0; _pos < len; _pos++){
+    this->str[pos] = __st[_pos];
+    pos++;
+  }
+  return *this;
+}
+
+STR& STR::overwrite(const char __c, size_t& pos, const size_t howmany){
+  size_t epos = pos + howmany;
+  while(pos < epos){
+    this->str[pos] = __c;
+    pos++;
+  }
+  return *this;
+}
+/****************************************/
+STR& STR::replace(const STR& __st1, const STR& __st2){
+  this->master_replace(__st1.str, __st2.str, __st1.len, __st2.len);
+  return *this;
+}
+
+STR& STR::replace(const STR& __st, const char __c){
+  this->master_replace(__st.str, &__c, __st.len, 1);
+  return *this;
+}
+
+STR& STR::replace(const STR& __st1, const char * __st2){
+  this->master_replace(__st1.str, __st2, __st1.len, arlen(__st2));
+  return *this;
+}
+
+STR& STR::replace(const char* __st1, const STR& __st2){
+  this->master_replace(__st1, __st2.str, arlen(__st1), __st2.len);
+  return *this;
+}
+
+STR& STR::replace(const char* __st, const char __c){
+  this->master_replace(__st, &__c, arlen(__st), 1);
+  return *this;
+}
+
+STR& STR::replace(const char* __st1, const char* __st2){
+  this->master_replace(__st1, __st2, arlen(__st1), arlen(__st2));
+  return *this;
+}
+
+STR& STR::replace(const char __c, const STR& __st){
+  this->master_replace(&__c, __st.str, 1, __st.len);
+  return *this;
+}
+
+STR& STR::replace(const char __c, const char* __st){
+  this->master_replace(&__c, __st, 1, arlen(__st));
+  return *this;
+}
+
+STR& STR::replace(const char __c1, const char __c2){
+  this->master_replace(&__c1, &__c2, 1, 1);
+  return *this;
+}
+/****************************************/
+//find() finds substring position in string
+size_t STR::find(const char __c, size_t pos){
+  while(pos < this->len){
+    if(this->str[pos] == __c){
+      return pos;
+    }//end if
+    pos++;
+  }//end while
+  return -1;
+}//end find()
+
+size_t STR::find(const STR& __st, size_t pos){
+  while(pos < this->len){//make sure we don't go passed our strings length
+    if(this->match(__st.str, __st.len, pos)){//check for string match
+      return pos;
+    }//end if
+  }//end while
+  return -1;
+}//end find
+
+size_t STR::find(const char *__st, size_t pos){
+  size_t stlen = arlen(__st);
+  while(pos < this->len){//make sure we don't go passed our strings length
+    if(this->match(__st, stlen, pos)){//check for first character match
+      return pos;
+    }//end if
+  }//end while
+  return -1;
+}
+/****************************************/
+CNT STR::count(const char __c){
+  CNT cnt;
+  size_t pos = 0;
+  while(pos < this->len){//make sure we don't go passed our strings length
+    if(this->str[pos] == __c){
+      cnt.set(pos);
+    }//end if
+    pos++;
+  }//end while
+  return cnt;
+}
+
+CNT STR::count(const char *__st){
+  CNT cnt;
+  size_t stlen = arlen(__st);
+  size_t pos = 0;
+  while(pos < this->len){//make sure we don't go passed our strings length
+    if(this->match(__st, stlen, pos)){//check for first character match
+      cnt.set(pos); //increment occurence counter
+      pos += stlen;
+    }//end if
+  }//end while
+  return cnt;
+}
+
+CNT STR::count(const STR& __st){
+  CNT cnt;
+  size_t pos = 0;
+  while(pos < this->len){//make sure we don't go passed our strings length
+    if(this->match(__st.str, __st.len, pos)){//check for first character match
+      cnt.set(pos); //increment occurence counter
+      pos += __st.len;
+    }//end if
+  }//end while
+  return cnt;
+}
+/****************************************/
+STR& STR::concat(const char __c, const size_t amount){
+  if(this->alocc(this->len + amount)){
+    this->overwrite(__c, this->len, amount);
+    this->str[this->len] = '\0';
+  }
+  return *this;
+}
+
+STR& STR::concat(const char *__st){
+  size_t stlen = arlen(__st);
+  if(this->alocc(this->len + stlen)){
+    this->overwrite(__st, this->len, stlen);
+    this->str[this->len] = '\0';
+  }
+  return *this;
+}
+
+STR& STR::concat(const STR& __st){
+  if(this->alocc(this->len + __st.len)){
+    this->overwrite(__st, this->len, __st.len);
+    this->str[this->len] = '\0';
+  }
+  return *this;
+}
+/****************************************/
+STR& STR::copy(const char __c){
+  if(__c == '\0'){
+    this->len = 0;
+    this->str[0] = __c;
+  }
+  else{
+    this->len = 1;
+    this->str[0] = __c;
+    this->str[1] = '\0';
+  }
+  return *this;
+}
+
+STR& STR::copy(const char *__st){
+  size_t stlen = arlen(__st);
+  if(this->alocc(stlen)){
+    arcpy(this->str, __st);
+    this->len = stlen;
+  }
+  return *this;
+}
+
+STR& STR::copy(const STR& __st){
+  if(this->alocc(__st.len)){
+    arcpy(this->str, __st.str);
+    this->len = __st.len;
+  }
+  return *this;
+}
+/****************************************/
+// private member functions
+/****************************************/
+bool STR::alocc(const size_t amount){
   if(amount >= this->cap){
     return false;
   }//end if
@@ -214,7 +429,7 @@ bool STR::alocc(size_t amount){
   }//end else
 }//end alocc()
 /****************************************/
-bool STR::shiftR(size_t& pos, size_t howmany){
+bool STR::shiftR(size_t& pos, const size_t howmany){
   if(this->alocc(this->len + howmany)){
     if(pos > this->len){
       pos = this->len;
@@ -235,7 +450,7 @@ bool STR::shiftR(size_t& pos, size_t howmany){
   }
 }
 /****************************************/
-bool STR::shiftL(size_t pos, size_t howmany, size_t epos){
+bool STR::shiftL(size_t pos, const size_t howmany, size_t epos){
   if(epos >= this->len || epos == 0){
     this->len -= howmany;
     epos = this->len;
@@ -245,107 +460,6 @@ bool STR::shiftL(size_t pos, size_t howmany, size_t epos){
     pos++;
   }
   return true;
-}
-/****************************************/
-//remove() deletes part of string
-STR& STR::remove(size_t pos, size_t howmany){
-  if(pos < this->len){
-    if(howmany >= (this->len - pos)){
-      this->str[pos] = '\0';
-      this->len = pos;
-    }
-    else{
-      this->shiftL(pos, howmany);
-    }
-  }
-  return *this;
-}
-/****************************************/
-//substr() returns part of string
-STR STR::substr(size_t pos, size_t howmany){
-  STR tmp(howmany + 1);
-  tmp.len = arncpy(tmp.str, this->str+pos, howmany);
-  return tmp;
-}
-/****************************************/
-//pop() removes characters from end of string
-STR& STR::pop(size_t howmany){
-  if(howmany >= this->len){
-    this->str[0] = '\0';
-    this->len = 0;
-  }
-  else{
-    this->len -= howmany;
-    this->str[this->len] = '\0';
-  }
-  return *this;
-}
-/****************************************/
-//inserts characters into string
-STR& STR::insert(STR& __st, size_t pos){
-  if(this->shiftR(pos, __st.len)){
-    this->overwrite(__st, pos, __st.len);
-  }//end if
-  return *this;
-}
-
-STR& STR::insert(const char* __st, size_t pos){
-  size_t stlen = arlen(__st);
-  if(this->shiftR(pos, stlen)){
-    this->overwrite(__st, pos, stlen);
-  }//end if
-  return *this;
-}
-
-STR& STR::insert(char* __st, size_t pos){
-  size_t stlen = arlen(__st);
-  if(this->shiftR(pos, stlen)){
-    this->overwrite(__st, pos, stlen);
-  }//end if
-  return *this;
-}
-
-STR& STR::insert(char __c, size_t pos, uint8_t howmany){
-  if(this->shiftR(pos, howmany)){
-    this->overwrite(__c, pos, howmany);
-  }//end if
-  return *this;
-}
-/****************************************/
-//overwrite() writes string or chars over prev string staring at pos
-//does not affect length unless the replavement string is larger than
-//the remaining string.
-STR& STR::overwrite(const STR& __st, size_t& pos, size_t len){
-  for(size_t _pos = 0; _pos < len; _pos++){
-    this->str[pos] = __st.str[_pos];
-    pos++;
-  }
-  return *this;
-}
-
-STR& STR::overwrite(const char* __st, size_t& pos, size_t len){
-  for(size_t _pos = 0; _pos < len; _pos++){
-    this->str[pos] = __st[_pos];
-    pos++;
-  }
-  return *this;
-}
-
-STR& STR::overwrite(char* __st, size_t& pos, size_t len){
-  for(size_t _pos = 0; _pos < len; _pos++){
-    this->str[pos] = __st[_pos];
-    pos++;
-  }
-  return *this;
-}
-
-STR& STR::overwrite(const char __c, size_t& pos, size_t howmany){
-  size_t epos = pos + howmany;
-  while(pos < epos){
-    this->str[pos] = __c;
-    pos++;
-  }
-  return *this;
 }
 /****************************************/
 bool STR::match(const char* __s, size_t const& len, size_t& pos){
@@ -361,8 +475,8 @@ bool STR::match(const char* __s, size_t const& len, size_t& pos){
   pos++;
   return false;
 }
-
-STR& STR::master_replace(const char* __s1, const char* __s2, size_t len1, size_t len2){
+/****************************************/
+STR& STR::master_replace(const char* __s1, const char* __s2, const size_t len1, const size_t len2){
   size_t pos = 0;
   if(len1 == len2){
     while(pos < this->len){
@@ -419,248 +533,5 @@ STR& STR::master_replace(const char* __s1, const char* __s2, size_t len1, size_t
       tdiff -= dlen;
     }//end for
   }//end else if
-  return *this;
-}
-
-STR& STR::replace(STR& __st1, STR& __st2){
-  this->master_replace(__st1.str, __st2.str, __st1.len, __st2.len);
-  return *this;
-}
-
-STR& STR::replace(STR& __st, char __c){
-  this->master_replace(__st.str, &__c, __st.len, 1);
-  return *this;
-}
-
-STR& STR::replace(STR& __st1, const char * __st2){
-  this->master_replace(__st1.str, __st2, __st1.len, arlen(__st2));
-  return *this;
-}
-
-STR& STR::replace(STR& __st1, char* __st2){
-  this->master_replace(__st1.str, __st2, __st1.len, arlen(__st2));
-  return *this;
-}
-
-STR& STR::replace(const char* __st1, STR& __st2){
-  this->master_replace(__st1, __st2.str, arlen(__st1), __st2.len);
-  return *this;
-}
-
-STR& STR::replace(const char* __st, char __c){
-  this->master_replace(__st, &__c, arlen(__st), 1);
-  return *this;
-}
-
-STR& STR::replace(const char* __st1, const char* __st2){
-  this->master_replace(__st1, __st2, arlen(__st1), arlen(__st2));
-  return *this;
-}
-
-STR& STR::replace(const char* __st1, char* __st2){
-  this->master_replace(__st1, __st2, arlen(__st1), arlen(__st2));
-  return *this;
-}
-
-STR& STR::replace(char* __st1, STR& __st2){
-  this->master_replace(__st1, __st2.str, arlen(__st1), __st2.len);
-  return *this;
-}
-
-STR& STR::replace(char* __st1, const char* __st2){
-  this->master_replace(__st1, __st2, arlen(__st1), arlen(__st2));
-  return *this;
-}
-
-STR& STR::replace(char* __st1, char* __st2){
-  this->master_replace(__st1, __st2, arlen(__st1), arlen(__st2));
-  return *this;
-}
-
-STR& STR::replace(char* __st, char __c){
-  this->master_replace(__st, &__c, arlen(__st), 1);
-  return *this;
-}
-
-STR& STR::replace(char __c, STR& __st){
-  this->master_replace(&__c, __st.str, 1, __st.len);
-  return *this;
-}
-
-STR& STR::replace(char __c, const char* __st){
-  this->master_replace(&__c, __st, 1, arlen(__st));
-  return *this;
-}
-
-STR& STR::replace(char __c, char* __st){
-  this->master_replace(&__c, __st, 1, arlen(__st));
-  return *this;
-}
-
-STR& STR::replace(char __c1, char __c2){
-  this->master_replace(&__c1, &__c2, 1, 1);
-  return *this;
-}
-/****************************************/
-//find() finds substring position in string
-size_t STR::find(char __c, size_t pos){
-  while(pos < this->len){
-    if(this->str[pos] == __c){
-      return pos;
-    }//end if
-    pos++;
-  }//end while
-  return -1;
-}//end find()
-
-size_t STR::find(STR const &__st, size_t pos){
-  while(pos < this->len){//make sure we don't go passed our strings length
-    if(this->match(__st.str, __st.len, pos)){//check for string match
-      return pos;
-    }//end if
-  }//end while
-  return -1;
-}//end find
-
-size_t STR::find(char *__st, size_t pos){
-  size_t stlen = arlen(__st);
-  while(pos < this->len){//make sure we don't go passed our strings length
-    if(this->match(__st, stlen, pos)){//check for first character match
-      return pos;
-    }//end if
-  }//end while
-  return -1;
-}
-
-size_t STR::find(const char *__st, size_t pos){
-  size_t stlen = arlen(__st);
-  while(pos < this->len){//make sure we don't go passed our strings length
-    if(this->match(__st, stlen, pos)){//check for first character match
-      return pos;
-    }//end if
-  }//end while
-  return -1;
-}
-/****************************************/
-CNT STR::count(char __c){
-  CNT cnt;
-  size_t pos = 0;
-  while(pos < this->len){//make sure we don't go passed our strings length
-    if(this->str[pos] == __c){
-      cnt.set(pos);
-    }//end if
-    pos++;
-  }//end while
-  return cnt;
-}
-
-CNT STR::count(char *__st){
-  CNT cnt;
-  size_t stlen = arlen(__st);
-  size_t pos = 0;
-  while(pos < this->len){//make sure we don't go passed our strings length
-    if(this->match(__st, stlen, pos)){//check for first character match
-      cnt.set(pos); //increment occurence counter
-      pos += stlen;//add length of string to pos
-    }//end if
-  }//end while
-  return cnt;
-}
-
-CNT STR::count(const char *__st){
-  CNT cnt;
-  size_t stlen = arlen(__st);
-  size_t pos = 0;
-  while(pos < this->len){//make sure we don't go passed our strings length
-    if(this->match(__st, stlen, pos)){//check for first character match
-      cnt.set(pos); //increment occurence counter
-      pos += stlen;
-    }//end if
-  }//end while
-  return cnt;
-}
-
-CNT STR::count(STR& __st){
-  CNT cnt;
-  size_t pos = 0;
-  while(pos < this->len){//make sure we don't go passed our strings length
-    if(this->match(__st.str, __st.len, pos)){//check for first character match
-      cnt.set(pos); //increment occurence counter
-      pos += __st.len;
-    }//end if
-  }//end while
-  return cnt;
-}
-/****************************************/
-STR& STR::concat(char __c, size_t amount){
-  if(this->alocc(this->len + amount)){
-    this->overwrite((const char)__c, this->len, amount);
-    this->str[this->len] = '\0';
-  }
-  return *this;
-}
-
-STR& STR::concat(const char *__st){
-  size_t stlen = arlen(__st);
-  if(this->alocc(this->len + stlen)){
-    this->overwrite(__st, this->len, stlen);
-    this->str[this->len] = '\0';
-  }
-  return *this;
-}
-
-STR& STR::concat(char *__st){
-  size_t stlen = arlen(__st);
-  if(this->alocc(this->len + stlen)){
-    this->overwrite(__st, this->len, stlen);
-    this->str[this->len] = '\0';
-  }
-  return *this;
-}
-
-STR& STR::concat(STR const &__st){
-  if(this->alocc(this->len + __st.len)){
-    this->overwrite(__st, this->len, __st.len);
-    this->str[this->len] = '\0';
-  }
-  return *this;
-}
-/****************************************/
-STR& STR::copy(char& __c){
-  if(__c == '\0'){
-    this->len = 0;
-    this->str[0] = __c;
-  }
-  else{
-    this->len = 1;
-    this->str[0] = __c;
-    this->str[1] = '\0';
-  }
-  return *this;
-}
-
-STR& STR::copy(char *__st){
-  size_t stlen = arlen(__st);
-  if(this->alocc(stlen)){
-    arcpy(this->str, __st);
-    this->len = stlen;
-  }
-  return *this;
-}
-
-STR& STR::copy(const char *__st){
-  size_t stlen = arlen(__st);
-  if(this->alocc(stlen)){
-    arcpy(this->str, __st);
-    this->len = stlen;
-  }
-  return *this;
-}
-
-STR& STR::copy(STR const &__st){
-  if(this->alocc(__st.len)){
-    arcpy(this->str, __st.str);
-    this->len = __st.len;
-  }
   return *this;
 }
