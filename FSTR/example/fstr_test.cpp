@@ -1,11 +1,11 @@
 #include <FSTR.h>
 #include <FSTR_stream.h>
-STR mystr("hello world!");
+fstr_t mystr("hello world!");
 int count;
 
 int main(){
-  //testing STR constructor
-  STR mystr2(mystr, 1000);
+  //testing fstr_t constructor
+  fstr_t mystr2(mystr, 1000);
   std::cout << mystr2 << std::endl;
 
   //testing string and char concatenation
@@ -17,15 +17,15 @@ int main(){
   mystr2 = mystr + " goodbye world!";
   std::cout << mystr2 << std::endl;
   mystr2 += " stupid world!";
-  //testing insert STR
-  STR mystr3("... NOT! ", 10);
+  //testing insert fstr_t
+  fstr_t mystr3("... NOT! ", 10);
   mystr2.insert(mystr3, 13);
   std::cout << mystr2 << '\n';
 
   std::cout << mystr2.substr(13)  << std::endl;
 
   //testing count() and find()
-  STR mystr4("world!", 7);
+  fstr_t mystr4("world!", 7);
   CNT cnt = mystr2.count(mystr4);
   std::cout << "found " << cnt.count << " occurences of \"world!\"" << '\n';
   std::cout << "found \"world!\" string at : ";
