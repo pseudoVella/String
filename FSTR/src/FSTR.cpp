@@ -132,14 +132,14 @@ size_t arlen(const char* __st){
   return pos;
 }
 
-char* arcpy(char* __st1, const char* __st2){
+size_t arcpy(char* __st1, const char* __st2){
   size_t pos = 0;
   while(__st2[pos] != '\0'){
     __st1[pos] = __st2[pos];
     pos++;
   }
   __st1[pos] = '\0';
-  return __st1;
+  return pos;
 }
 
 size_t arncpy(char* __st1, const char* __st2, const size_t& amount){
@@ -413,16 +413,14 @@ fstr_t& fstr_t::copy(const char& __c){
 fstr_t& fstr_t::copy(const char* __st){
   size_t stlen = arlen(__st);
   if(this->alocc(stlen)){
-    arcpy(this->str, __st);
-    this->len = stlen;
+     this->len = arcpy(this->str, __st);
   }
   return *this;
 }
 
 fstr_t& fstr_t::copy(const fstr_t& __st){
   if(this->alocc(__st.len)){
-    arcpy(this->str, __st.str);
-    this->len = __st.len;
+    this->len = arcpy(this->str, __st.str);
   }
   return *this;
 }
@@ -430,12 +428,8 @@ fstr_t& fstr_t::copy(const fstr_t& __st){
 // private member functions
 /****************************************/
 bool fstr_t::alocc(const size_t& amount){
-  if(amount >= this->cap){
-    return false;
-  }//end if
-  else{
-    return true;
-  }//end else
+  if(amount >= this->cap) return false;
+  else return true;
 }//end alocc()
 /****************************************/
 bool fstr_t::shiftR(size_t& pos, const size_t& howmany){

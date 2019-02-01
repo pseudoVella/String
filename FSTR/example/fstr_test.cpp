@@ -70,12 +70,12 @@ int main(){
   std::cout << "occurences of the letter \"a\" : " << mystr2.count('a').count << '\n';
 
   //testing pop + filling with character
-  mystr2.pop(201);
+  mystr2.pop(910);
 //  std::cout << mystr2.length() << '\n';
   mystr2.insert('b', 90, 90);
 //  std::cout << mystr2.length() << '\n';
   std::cout << mystr2 << std::endl;
-  mystr2.insert("NOT A!!!!", 80);
+  mystr2.insert("NOT A!!!!", 90);
   std::cout << mystr2 << std::endl;
   std::cout << "occurences of the letter \"b\" : ";
   std::cout << mystr2.count('b').count << '\n';

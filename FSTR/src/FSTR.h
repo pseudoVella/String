@@ -99,7 +99,7 @@ typedef struct fstr_t{
     bool match(const char* __s, const size_t& len, size_t& pos);
 }fstr_t;
 
-char* arcpy(char* __st1, const char* __st2);
+size_t arcpy(char* __st1, const char* __st2);
 size_t arncpy(char* __st1, const char* __st2, const size_t& amount);
 size_t arlen(const char* __st);
 
