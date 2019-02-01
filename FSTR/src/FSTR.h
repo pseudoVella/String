@@ -25,7 +25,7 @@ typedef struct fstr_t{
     const size_t& capacity()const;
     const char* cstr()const;
 
-    fstr_t& pop(const size_t& howmany = -1);
+    fstr_t& pop(const size_t& howmany = 1);
 
     fstr_t& remove(const size_t& pos, const size_t& howmany = -1);
 
@@ -35,7 +35,7 @@ typedef struct fstr_t{
 
     fstr_t& overwrite(const fstr_t& __st, size_t& pos, const size_t& len);
     fstr_t& overwrite(const char* __st, size_t& pos, const size_t& len);
-    fstr_t& overwrite(const char& __c, size_t& pos, const size_t& howmany = 1);
+    fstr_t& overwrite(const char& __c, size_t& pos, const size_t& howmany);
 
     fstr_t& replace(const fstr_t& __st1, const fstr_t& __st2);
     fstr_t& replace(const fstr_t& __st1, const char* __st2);
@@ -93,7 +93,7 @@ typedef struct fstr_t{
 
     bool alocc(const size_t& amount);
     bool shiftR(size_t& pos, const size_t& howmany);
-    bool shiftL(size_t pos, const size_t& howmany, size_t epos = 0);
+    bool shiftL(size_t pos, const size_t& howmany, const size_t& epos = 0U);
 
     fstr_t& master_replace(const char*__s1, const char* __s2, const size_t& len1, const size_t& len2);
     bool match(const char* __s, const size_t& len, size_t& pos);

@@ -123,7 +123,7 @@ fstr_t::fstr_t(const size_t& maxlen){
 /*********************************************************/
 //helper functions
 /*********************************************************/
-//use these instead of fstr_tlen() and fstr_tcpy() so we can omit the standard fstr_ting library
+//use these instead of strlen() and strcpy() so we can omit the standard string library
 size_t arlen(const char* __st){
   size_t pos = 0;
   while(__st[pos] != '\0'){
@@ -166,7 +166,7 @@ const char* fstr_t::cstr()const{
   return this->str;
 }
 /****************************************/
-//remove() deletes part of fstr_ting
+//remove() deletes part of fstr_t
 fstr_t& fstr_t::remove(const size_t& pos, const size_t& howmany){
   if(pos < this->len){
     if(howmany >= (this->len - pos)){
@@ -180,14 +180,25 @@ fstr_t& fstr_t::remove(const size_t& pos, const size_t& howmany){
   return *this;
 }
 /****************************************/
-//substr() returns part of fstr_ting
+//substr() returns part of fstr_t
 fstr_t fstr_t::substr(const size_t& pos, const size_t& howmany){
-  fstr_t tmp(howmany + 1);
-  tmp.len = arncpy(tmp.str, this->str+pos, howmany);
-  return tmp;
+	if(pos>this->len){
+		fstr_t tmp("");
+		return tmp;
+	}
+	if(howmany > (this->len - pos)){
+		fstr_t tmp(this->len - pos);
+		tmp.len = arncpy(tmp.str, this->str+pos, (this->len - pos));
+	  return tmp;
+	}
+	else{
+	  fstr_t tmp(howmany + 1);
+		tmp.len = arncpy(tmp.str, this->str+pos, howmany);
+  	return tmp;
+  }
 }
 /****************************************/
-//pop() removes characters from end of fstr_ting
+//pop() removes characters from end of fstr_t
 fstr_t& fstr_t::pop(const size_t& howmany){
   if(howmany >= this->len){
     this->str[0] = '\0';
@@ -200,7 +211,7 @@ fstr_t& fstr_t::pop(const size_t& howmany){
   return *this;
 }
 /****************************************/
-//inserts characters into fstr_ting
+//inserts characters into fstr_t
 fstr_t& fstr_t::insert(const fstr_t& __st, size_t pos){
   if(this->shiftR(pos, __st.len)){
     this->overwrite(__st, pos, __st.len);
@@ -223,9 +234,7 @@ fstr_t& fstr_t::insert(const char& __c, size_t pos, const uint8_t& howmany){
   return *this;
 }
 /****************************************/
-//overwrite() writes fstr_ting or chars over prev fstr_ting staring at pos
-//does not affect length unless the replavement fstr_ting is larger than
-//the remaining fstr_ting.
+//overwrite() writes syring or chars over prev string staring at pos
 fstr_t& fstr_t::overwrite(const fstr_t& __st, size_t& pos, const size_t& len){
   for(size_t _pos = 0; _pos < len; _pos++){
     this->str[pos] = __st.str[_pos];
@@ -296,7 +305,7 @@ fstr_t& fstr_t::replace(const char& __c1, const char& __c2){
   return *this;
 }
 /****************************************/
-//find() finds substring position in fstr_ting
+//find() finds substring position in fstr_t
 size_t fstr_t::find(const char& __c, size_t pos){
   while(pos < this->len){
     if(this->str[pos] == __c){
@@ -308,8 +317,8 @@ size_t fstr_t::find(const char& __c, size_t pos){
 }//end find()
 
 size_t fstr_t::find(const fstr_t& __st, size_t pos){
-  while(pos < this->len){//make sure we don't go passed our fstr_tings length
-    if(this->match(__st.str, __st.len, pos)){//check for fstr_ting match
+  while(pos < this->len){//make sure we don't go passed our strings length
+    if(this->match(__st.str, __st.len, pos)){//check for string match
       return pos;
     }//end if
   }//end while
@@ -318,7 +327,7 @@ size_t fstr_t::find(const fstr_t& __st, size_t pos){
 
 size_t fstr_t::find(const char* __st, size_t pos){
   size_t stlen = arlen(__st);
-  while(pos < this->len){//make sure we don't go passed our fstr_tings length
+  while(pos < this->len){//make sure we don't go passed our strings length
     if(this->match(__st, stlen, pos)){//check for first character match
       return pos;
     }//end if
@@ -329,7 +338,7 @@ size_t fstr_t::find(const char* __st, size_t pos){
 CNT fstr_t::count(const char& __c){
   CNT cnt;
   size_t pos = 0;
-  while(pos < this->len){//make sure we don't go passed our fstr_tings length
+  while(pos < this->len){//make sure we don't go passed our strings length
     if(this->str[pos] == __c){
       cnt.set(pos);
     }//end if
@@ -342,7 +351,7 @@ CNT fstr_t::count(const char* __st){
   CNT cnt;
   size_t stlen = arlen(__st);
   size_t pos = 0;
-  while(pos < this->len){//make sure we don't go passed our fstr_tings length
+  while(pos < this->len){//make sure we don't go passed our strings length
     if(this->match(__st, stlen, pos)){//check for first character match
       cnt.set(pos); //increment occurence counter
       pos += stlen;
@@ -354,7 +363,7 @@ CNT fstr_t::count(const char* __st){
 CNT fstr_t::count(const fstr_t& __st){
   CNT cnt;
   size_t pos = 0;
-  while(pos < this->len){//make sure we don't go passed our fstr_tings length
+  while(pos < this->len){//make sure we don't go passed our strings length
     if(this->match(__st.str, __st.len, pos)){//check for first character match
       cnt.set(pos); //increment occurence counter
       pos += __st.len;
@@ -450,15 +459,20 @@ bool fstr_t::shiftR(size_t& pos, const size_t& howmany){
   }
 }
 /****************************************/
-bool fstr_t::shiftL(size_t pos, const size_t& howmany, size_t epos){
+bool fstr_t::shiftL(size_t pos, const size_t& howmany, const size_t& epos){
   if(epos >= this->len || epos == 0){
     this->len -= howmany;
-    epos = this->len;
-  }
-  while(pos < epos){
-    this->str[pos] = this->str[pos + howmany];
-    pos++;
-  }
+	  while(pos < this->len){
+  	  this->str[pos] = this->str[pos + howmany];
+    	pos++;
+		}
+	}
+	else{
+	  while(pos < epos){
+  	  this->str[pos] = this->str[pos + howmany];
+    	pos++;
+  	}
+	}
   return true;
 }
 /****************************************/
@@ -480,7 +494,7 @@ fstr_t& fstr_t::master_replace(const char* __s1, const char* __s2, const size_t&
   size_t pos = 0;
   if(len1 == len2){
     while(pos < this->len){
-      if(this->match(__s1, len1, pos)){//check for fstr_ting match
+      if(this->match(__s1, len1, pos)){//check for string match
         this->overwrite(__s2, pos, len2);
       }//end if
     }//end while
@@ -491,7 +505,7 @@ fstr_t& fstr_t::master_replace(const char* __s1, const char* __s2, const size_t&
     size_t lastpos;
     size_t matches = 0;
     while(pos < this->len){//check for valid match
-      if(this->match(__s1, len1, pos)){//check for fstr_ting match
+      if(this->match(__s1, len1, pos)){//check for string match
         matches++;
         if(matches == 1){
           this->overwrite(__s2, pos, len2);
@@ -505,7 +519,7 @@ fstr_t& fstr_t::master_replace(const char* __s1, const char* __s2, const size_t&
         lastpos = pos;//save pos
         pos += tdiff;
       }//end if
-      if(pos >= this->len && matches > 0){//no next fstr_ting match, remove blank spaces
+      if(pos >= this->len && matches > 0){//no next string match, remove blank spaces
         this->remove(lastpos, tdiff);
       }//end if
     }//end while
@@ -519,9 +533,9 @@ fstr_t& fstr_t::master_replace(const char* __s1, const char* __s2, const size_t&
       pos = cnt.occ[cnt.count - x] + len1;
       if(x == 1){
         for(size_t y = this->len; y >= pos; y--){
-          this->str[y + tdiff] = this->str[y]; //moves end of fstr_ting copies null
+          this->str[y + tdiff] = this->str[y]; //moves end of fstr_t copies null
         }//end for
-        this->len += tdiff;//update fstr_ting length
+        this->len += tdiff;//update fstr_t length
       }//end if
       else{
         for(size_t y = cnt.occ[cnt.count - x + 1] - 1; y >= pos; y--){
